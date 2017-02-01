@@ -6,7 +6,7 @@
 ##' FredR has been designed in a way that gives a user a complete interface to
 ##' all available functionalities of the API.
 ##'
-##' 
+##'
 ##' @title FredR: R Interface to Federal Reserve Economic Data API
 ##' @param api.key API key (required). You can get the key by registering at the
 ##' following address: http://api.stlouisfed.org/api_key.html
@@ -28,10 +28,10 @@ FredR <- function(api.key = NULL){
         xmlApply(xmlRoot(xmlObj), xmlAttrs) %>>%
         list.map(. %>>% as.list %>>% as.data.table) %>>%
         rbindlist(fill = TRUE) ->
-            dt        
+            dt
         return(dt)
     }
-    
+
     ## recursive function: iteratively look for children
     getCategory <- function(category.id){
         query = 'fred/category'
@@ -52,7 +52,7 @@ FredR <- function(api.key = NULL){
         xmlApply(xmlAttrs)
     }
     ## getCategory(0)
-    
+
     getChildrenList <- function(category.id){
         query = 'fred/category/children'
         getURL(
@@ -71,10 +71,10 @@ FredR <- function(api.key = NULL){
         xmlRoot %>>%
         xmlApply(xmlAttrs)
     }
-    
+
     traverseCategories = function(category.id = 0){
         cat(category.id,"\n")
-        
+
         l <- getChildrenList(category.id)
         if (names(l) == 'text' & is.null(l[['text']])){
             getCategory(category.id) %>>%
@@ -89,7 +89,7 @@ FredR <- function(api.key = NULL){
                 )
             )
         }
-        
+
         l %>>%
         list.map({
             temp <- . %>>% as.list
@@ -113,6 +113,13 @@ FredR <- function(api.key = NULL){
     ## ---------------------------------------------------------------------- ##
     ## CATEGORIES                                                             ##
     ## ---------------------------------------------------------------------- ##
+    ##' @title category :
+    ##' @param category.id The FRED category ID
+    ##
+    ##' @return a datatable
+    ##' @author Janko Cizel
+    ##' @export
+    ##' @import XML RCurl data.table pipeR rlist dplyr
     category <- function(
         category_id = NULL
     ){
@@ -128,8 +135,8 @@ FredR <- function(api.key = NULL){
         )
 
         if (!is.null(category_id))
-            sprintf('%s&category_id=%s',url,category_id) -> url        
-        
+            sprintf('%s&category_id=%s',url,category_id) -> url
+
         getURL(
             url = url %>>%
             URLencode
@@ -138,8 +145,8 @@ FredR <- function(api.key = NULL){
             useInternalNodes = TRUE
         ) -> l
 
-        dt <- xml2dt(l) 
-        
+        dt <- xml2dt(l)
+
         return(dt)
     }
 
@@ -158,8 +165,8 @@ FredR <- function(api.key = NULL){
         )
 
         if (!is.null(category_id))
-            sprintf('%s&category_id=%s',url,category_id) -> url        
-        
+            sprintf('%s&category_id=%s',url,category_id) -> url
+
         getURL(
             url = url %>>%
             URLencode
@@ -168,10 +175,10 @@ FredR <- function(api.key = NULL){
             useInternalNodes = TRUE
         ) -> l
 
-        dt <- xml2dt(l) 
-        
+        dt <- xml2dt(l)
+
         return(dt)
-    }    
+    }
 
     category.related <- function(
         category_id = NULL
@@ -188,8 +195,8 @@ FredR <- function(api.key = NULL){
         )
 
         if (!is.null(category_id))
-            sprintf('%s&category_id=%s',url,category_id) -> url        
-        
+            sprintf('%s&category_id=%s',url,category_id) -> url
+
         getURL(
             url = url %>>%
             URLencode
@@ -198,10 +205,10 @@ FredR <- function(api.key = NULL){
             useInternalNodes = TRUE
         ) -> l
 
-        dt <- xml2dt(l) 
-        
+        dt <- xml2dt(l)
+
         return(dt)
-    }    
+    }
 
 
     category.series <- function(
@@ -212,7 +219,7 @@ FredR <- function(api.key = NULL){
         if (is.null(category_id))
             stop("category_id is a required argument")
         if (limit > 1000 | limit < 0)
-            stop("Limit must be between 0 and 1000.")        
+            stop("Limit must be between 0 and 1000.")
 
         query = 'fred/category/series'
         url = sprintf(
@@ -227,8 +234,8 @@ FredR <- function(api.key = NULL){
         if (!is.null(limit))
             sprintf('%s&limit=%s',url,limit) -> url
         if (!is.null(offset))
-            sprintf('%s&offset=%s',url,offset) -> url                        
-        
+            sprintf('%s&offset=%s',url,offset) -> url
+
         getURL(
             url = url %>>%
             URLencode
@@ -237,8 +244,8 @@ FredR <- function(api.key = NULL){
             useInternalNodes = TRUE
         ) -> l
 
-        dt <- xml2dt(l) 
-        
+        dt <- xml2dt(l)
+
         return(dt)
     }
 
@@ -249,7 +256,7 @@ FredR <- function(api.key = NULL){
         if (is.null(category_id))
             stop("category_id is a required argument")
         if (limit > 1000 | limit < 0)
-            stop("Limit must be between 0 and 1000.")        
+            stop("Limit must be between 0 and 1000.")
 
         query = 'fred/category/tags'
         url = sprintf(
@@ -262,8 +269,8 @@ FredR <- function(api.key = NULL){
         if (!is.null(category_id))
             sprintf('%s&category_id=%s',url,category_id) -> url
         if (!is.null(limit))
-            sprintf('%s&limit=%s',url,limit) -> url                
-        
+            sprintf('%s&limit=%s',url,limit) -> url
+
         getURL(
             url = url %>>%
             URLencode
@@ -272,8 +279,8 @@ FredR <- function(api.key = NULL){
             useInternalNodes = TRUE
         ) -> l
 
-        dt <- xml2dt(l) 
-        
+        dt <- xml2dt(l)
+
         return(dt)
     }
 
@@ -284,7 +291,7 @@ FredR <- function(api.key = NULL){
         if (is.null(category_id))
             stop("category_id is a required argument")
         if (limit > 1000 | limit < 0)
-            stop("Limit must be between 0 and 1000.")        
+            stop("Limit must be between 0 and 1000.")
 
         query = 'fred/category/related_tags'
         url = sprintf(
@@ -297,8 +304,8 @@ FredR <- function(api.key = NULL){
         if (!is.null(category_id))
             sprintf('%s&category_id=%s',url,category_id) -> url
         if (!is.null(limit))
-            sprintf('%s&limit=%s',url,limit) -> url                
-        
+            sprintf('%s&limit=%s',url,limit) -> url
+
         getURL(
             url = url %>>%
             URLencode
@@ -307,10 +314,10 @@ FredR <- function(api.key = NULL){
             useInternalNodes = TRUE
         ) -> l
 
-        dt <- xml2dt(l) 
-        
+        dt <- xml2dt(l)
+
         return(dt)
-    }    
+    }
 
     ## ---------------------------------------------------------------------- ##
     ##                             RELEASES                                   ##
@@ -320,7 +327,7 @@ FredR <- function(api.key = NULL){
     ){
         if (limit > 1000 | limit < 0)
             stop("Limit must be between 0 and 1000.")
-        
+
         query = 'fred/releases'
         url = sprintf(
             "%s/%s?&api_key=%s",
@@ -330,8 +337,8 @@ FredR <- function(api.key = NULL){
         )
 
         if (!is.null(limit))
-            sprintf('%s&limit=%s',url,limit) -> url        
-        
+            sprintf('%s&limit=%s',url,limit) -> url
+
         getURL(
             url = url %>>%
             URLencode
@@ -340,9 +347,9 @@ FredR <- function(api.key = NULL){
             useInternalNodes = TRUE
         ) -> l
 
-        dt <- xml2dt(l) 
+        dt <- xml2dt(l)
 
-        return(dt)                
+        return(dt)
     }
 
     releases.dates <- function(
@@ -351,7 +358,7 @@ FredR <- function(api.key = NULL){
     ){
         if (limit > 1000 | limit < 0)
             stop("Limit must be between 0 and 1000.")
-        
+
         query = 'fred/releases/dates'
         url = sprintf(
             "%s/%s?&api_key=%s",
@@ -363,8 +370,8 @@ FredR <- function(api.key = NULL){
         if (!is.null(limit))
             sprintf('%s&limit=%s',url,limit) -> url
         if (!is.null(include_release_dates_with_no_data))
-            sprintf('%s&include_release_dates_with_no_data=%s',url,include_release_dates_with_no_data) -> url        
-        
+            sprintf('%s&include_release_dates_with_no_data=%s',url,include_release_dates_with_no_data) -> url
+
         getURL(
             url = url %>>%
             URLencode
@@ -373,9 +380,9 @@ FredR <- function(api.key = NULL){
             useInternalNodes = TRUE
         ) -> l
 
-        dt <- xml2dt(l) 
+        dt <- xml2dt(l)
 
-        return(dt)                
+        return(dt)
     }
 
 
@@ -387,7 +394,7 @@ FredR <- function(api.key = NULL){
             stop('release_id is a required argument.')
         if (limit > 1000 | limit < 0)
             stop("Limit must be between 0 and 1000.")
-        
+
         query = 'fred/release'
         url = sprintf(
             "%s/%s?&api_key=%s",
@@ -397,10 +404,10 @@ FredR <- function(api.key = NULL){
         )
 
         if (!is.null(release_id))
-            sprintf('%s&release_id=%s',url,release_id %>>% paste(collapse=";")) -> url        
+            sprintf('%s&release_id=%s',url,release_id %>>% paste(collapse=";")) -> url
         if (!is.null(limit))
             sprintf('%s&limit=%s',url,limit) -> url
-        
+
         getURL(
             url = url %>>%
             URLencode
@@ -409,9 +416,9 @@ FredR <- function(api.key = NULL){
             useInternalNodes = TRUE
         ) -> l
 
-        dt <- xml2dt(l) 
+        dt <- xml2dt(l)
 
-        return(dt)                
+        return(dt)
     }
 
     release.dates <- function(
@@ -422,7 +429,7 @@ FredR <- function(api.key = NULL){
             stop('release_id is a required argument.')
         if (limit > 1000 | limit < 0)
             stop("Limit must be between 0 and 1000.")
-        
+
         query = 'fred/release/dates'
         url = sprintf(
             "%s/%s?&api_key=%s",
@@ -432,10 +439,10 @@ FredR <- function(api.key = NULL){
         )
 
         if (!is.null(release_id))
-            sprintf('%s&release_id=%s',url,release_id %>>% paste(collapse=";")) -> url        
+            sprintf('%s&release_id=%s',url,release_id %>>% paste(collapse=";")) -> url
         if (!is.null(limit))
             sprintf('%s&limit=%s',url,limit) -> url
-        
+
         getURL(
             url = url %>>%
             URLencode
@@ -444,9 +451,9 @@ FredR <- function(api.key = NULL){
             useInternalNodes = TRUE
         ) -> l
 
-        dt <- xml2dt(l) 
+        dt <- xml2dt(l)
 
-        return(dt)                
+        return(dt)
     }
 
     release.series <- function(
@@ -458,7 +465,7 @@ FredR <- function(api.key = NULL){
             stop('release_id is a required argument.')
         if (limit > 1000 | limit < 0)
             stop("Limit must be between 0 and 1000.")
-        
+
         query = 'fred/release/series'
         url = sprintf(
             "%s/%s?&api_key=%s",
@@ -468,12 +475,12 @@ FredR <- function(api.key = NULL){
         )
 
         if (!is.null(release_id))
-            sprintf('%s&release_id=%s',url,release_id %>>% paste(collapse=";")) -> url        
+            sprintf('%s&release_id=%s',url,release_id %>>% paste(collapse=";")) -> url
         if (!is.null(limit))
             sprintf('%s&limit=%s',url,limit) -> url
         if (!is.null(offset))
-            sprintf('%s&offset=%s',url,offset) -> url                                
-        
+            sprintf('%s&offset=%s',url,offset) -> url
+
         getURL(
             url = url %>>%
             URLencode
@@ -482,9 +489,9 @@ FredR <- function(api.key = NULL){
             useInternalNodes = TRUE
         ) -> l
 
-        dt <- xml2dt(l) 
+        dt <- xml2dt(l)
 
-        return(dt)                
+        return(dt)
     }
 
     release.tags <- function(
@@ -499,7 +506,7 @@ FredR <- function(api.key = NULL){
             stop('release_id is a required argument.')
         if (limit > 1000 | limit < 0)
             stop("Limit must be between 0 and 1000.")
-        
+
         query = 'fred/release/tags'
         url = sprintf(
             "%s/%s?&api_key=%s",
@@ -509,7 +516,7 @@ FredR <- function(api.key = NULL){
         )
 
         if (!is.null(release_id))
-            sprintf('%s&release_id=%s',url,release_id %>>% paste(collapse=";")) -> url        
+            sprintf('%s&release_id=%s',url,release_id %>>% paste(collapse=";")) -> url
         if (!is.null(limit))
             sprintf('%s&limit=%s',url,limit) -> url
         if (!is.null(tag_names))
@@ -520,7 +527,7 @@ FredR <- function(api.key = NULL){
             sprintf('%s&tag_group_id=%s',url,tag_group_id) -> url
         if (!is.null(search_text))
             sprintf('%s&search_text=%s',url,search_text) -> url
-        
+
         getURL(
             url = url %>>%
             URLencode
@@ -529,9 +536,9 @@ FredR <- function(api.key = NULL){
             useInternalNodes = TRUE
         ) -> l
 
-        dt <- xml2dt(l) 
+        dt <- xml2dt(l)
 
-        return(dt)                
+        return(dt)
     }
 
     release.related_tags <- function(
@@ -546,7 +553,7 @@ FredR <- function(api.key = NULL){
             stop('release_id is a required argument.')
         if (limit > 1000 | limit < 0)
             stop("Limit must be between 0 and 1000.")
-        
+
         query = 'fred/release/related_tags'
         url = sprintf(
             "%s/%s?&api_key=%s",
@@ -556,7 +563,7 @@ FredR <- function(api.key = NULL){
         )
 
         if (!is.null(release_id))
-            sprintf('%s&release_id=%s',url,release_id %>>% paste(collapse=";")) -> url        
+            sprintf('%s&release_id=%s',url,release_id %>>% paste(collapse=";")) -> url
         if (!is.null(limit))
             sprintf('%s&limit=%s',url,limit) -> url
         if (!is.null(tag_names))
@@ -567,7 +574,7 @@ FredR <- function(api.key = NULL){
             sprintf('%s&tag_group_id=%s',url,tag_group_id) -> url
         if (!is.null(search_text))
             sprintf('%s&search_text=%s',url,search_text) -> url
-        
+
         getURL(
             url = url %>>%
             URLencode
@@ -576,9 +583,9 @@ FredR <- function(api.key = NULL){
             useInternalNodes = TRUE
         ) -> l
 
-        dt <- xml2dt(l) 
+        dt <- xml2dt(l)
 
-        return(dt)                
+        return(dt)
     }
 
     release.sources <- function(
@@ -586,7 +593,7 @@ FredR <- function(api.key = NULL){
     ){
         if (is.null(release_id))
             stop('release_id is a required argument.')
-        
+
         query = 'fred/release/sources'
         url = sprintf(
             "%s/%s?&api_key=%s",
@@ -596,7 +603,7 @@ FredR <- function(api.key = NULL){
         )
 
         if (!is.null(release_id))
-            sprintf('%s&release_id=%s',url,release_id %>>% paste(collapse=";")) -> url        
+            sprintf('%s&release_id=%s',url,release_id %>>% paste(collapse=";")) -> url
 
         getURL(
             url = url %>>%
@@ -606,12 +613,12 @@ FredR <- function(api.key = NULL){
             useInternalNodes = TRUE
         ) -> l
 
-        dt <- xml2dt(l) 
+        dt <- xml2dt(l)
 
-        return(dt)                
-    }             
+        return(dt)
+    }
 
-    
+
     ## ---------------------------------------------------------------------- ##
     ##                             SERIES                                     ##
     ## ---------------------------------------------------------------------- ##
@@ -620,7 +627,7 @@ FredR <- function(api.key = NULL){
     ){
         if (is.null(series_id))
             stop('series_id is a required input.')
-        
+
         query = 'fred/series'
         getURL(
             url = sprintf(
@@ -636,9 +643,9 @@ FredR <- function(api.key = NULL){
             useInternalNodes = TRUE
         ) -> l
 
-        dt <- xml2dt(l) 
+        dt <- xml2dt(l)
 
-        return(dt)      
+        return(dt)
     }
 
     series.categories <- function(
@@ -646,7 +653,7 @@ FredR <- function(api.key = NULL){
     ){
         if (is.null(series_id))
             stop('series_id is a required input.')
-        
+
         query = 'fred/series/categories'
         getURL(
             url = sprintf(
@@ -662,9 +669,9 @@ FredR <- function(api.key = NULL){
             useInternalNodes = TRUE
         ) -> l
 
-        dt <- xml2dt(l) 
+        dt <- xml2dt(l)
 
-        return(dt)                
+        return(dt)
     }
 
     series.observations <- function(
@@ -678,18 +685,19 @@ FredR <- function(api.key = NULL){
                                         # 'wef', 'weth', 'wew', 'wetu', 'wem',
                                         # 'wesu', 'wesa', 'bwew', 'bwem'
         aggregation_method = NULL,      #'avg', 'sum', 'eop'
-        output_type = NULL              #  '1', '2', '3', '4'
+        output_type = NULL,              #  '1', '2', '3', '4'
                                         # 1 = Observations by Real-Time Period
                                         # 2 = Observations by Vintage Date, All Observations
                                         # 3 = Observations by Vintage Date, New and Revised Observations Only
                                         # 4 = Observations, Initial Release Only
-        
-    ){
+
+        sort_order # 'asc', 'desc'
+         ){
         if (is.null(series_id))
             stop('series_id is a required input.')
 
         query = 'fred/series/observations'
-        
+
         url = sprintf(
             "%s/%s?series_id=%s&api_key=%s",
             root,
@@ -697,7 +705,7 @@ FredR <- function(api.key = NULL){
             series_id,
             api.key
         )
-        
+
         if (!is.null(limit))
             sprintf('%s&limit=%s',url,limit) -> url
 
@@ -717,8 +725,11 @@ FredR <- function(api.key = NULL){
             sprintf('%s&aggregation_method=%s',url,aggregation_method) -> url
 
         if (!is.null(output_type))
-            sprintf('%s&output_type=%s',url,output_type) -> url        
-                
+            sprintf('%s&output_type=%s',url,output_type) -> url
+
+        if (!is.null(sorted_by) && (sorted_by == 'asc' || sorted_by == 'desc'))
+            sprintf('%s&sorted_by=%s', url, sorted_by) -> url
+
         getURL(
             url = url %>>% URLencode
         ) %>>%
@@ -726,9 +737,9 @@ FredR <- function(api.key = NULL){
             useInternalNodes = TRUE
         ) -> l
 
-        dt <- xml2dt(l) 
+        dt <- xml2dt(l)
 
-        return(dt)        
+        return(dt)
     }
 
     series.release <- function(
@@ -736,7 +747,7 @@ FredR <- function(api.key = NULL){
     ){
         if (is.null(series_id))
             stop('series_id is a required input.')
-        
+
         query = 'fred/series/release'
         getURL(
             url = sprintf(
@@ -752,9 +763,9 @@ FredR <- function(api.key = NULL){
             useInternalNodes = TRUE
         ) -> l
 
-        dt <- xml2dt(l) 
+        dt <- xml2dt(l)
 
-        return(dt)                
+        return(dt)
     }
 
     series.search <- function(
@@ -769,7 +780,7 @@ FredR <- function(api.key = NULL){
     ){
         if (is.null(text))
             stop('Specify a search string.')
-        
+
         query = 'fred/series/search'
         getURL(
             url = sprintf(
@@ -788,7 +799,7 @@ FredR <- function(api.key = NULL){
             useInternalNodes = TRUE
         ) -> l
 
-        dt <- xml2dt(l) 
+        dt <- xml2dt(l)
 
         return(dt)
     }
@@ -798,7 +809,7 @@ FredR <- function(api.key = NULL){
     ){
         if (is.null(series_search_text))
             stop('series_search_text and tag_names are required inputs for this function.')
-        
+
         query = 'fred/series/search/tags'
         getURL(
             url = sprintf(
@@ -814,9 +825,9 @@ FredR <- function(api.key = NULL){
             useInternalNodes = TRUE
         ) -> l
 
-        dt <- xml2dt(l) 
+        dt <- xml2dt(l)
 
-        return(dt)      
+        return(dt)
     }
 
     series.search.related_tags <- function(
@@ -825,7 +836,7 @@ FredR <- function(api.key = NULL){
     ){
         if (is.null(series_search_text) | is.null(tag_names))
             stop('series_search_text and tag_names are required inputs for this function.')
-        
+
         query = 'fred/series/search/related_tags'
         getURL(
             url = sprintf(
@@ -842,9 +853,9 @@ FredR <- function(api.key = NULL){
             useInternalNodes = TRUE
         ) -> l
 
-        dt <- xml2dt(l) 
+        dt <- xml2dt(l)
 
-        return(dt)      
+        return(dt)
     }
 
     series.tags <- function(
@@ -852,7 +863,7 @@ FredR <- function(api.key = NULL){
     ){
         if (is.null(series_id))
             stop('series_id is a required input.')
-        
+
         query = 'fred/series/tags'
         getURL(
             url = sprintf(
@@ -868,9 +879,9 @@ FredR <- function(api.key = NULL){
             useInternalNodes = TRUE
         ) -> l
 
-        dt <- xml2dt(l) 
+        dt <- xml2dt(l)
 
-        return(dt)                
+        return(dt)
     }
 
     series.updates <- function(){
@@ -888,9 +899,9 @@ FredR <- function(api.key = NULL){
             useInternalNodes = TRUE
         ) -> l
 
-        dt <- xml2dt(l) 
+        dt <- xml2dt(l)
 
-        return(dt)                
+        return(dt)
     }
 
     series.vintagedates <- function(
@@ -903,7 +914,7 @@ FredR <- function(api.key = NULL){
     ){
         if (is.null(series_id))
             stop('series_id is a required input.')
-        
+
         query = 'fred/series/vintagedates'
         getURL(
             url = sprintf(
@@ -939,7 +950,7 @@ FredR <- function(api.key = NULL){
     ){
         if (limit > 1000 | limit < 0)
             stop("Limit must be between 0 and 1000.")
-        
+
         query = 'fred/sources'
         url = sprintf(
             "%s/%s?&api_key=%s",
@@ -949,8 +960,8 @@ FredR <- function(api.key = NULL){
         )
 
         if (!is.null(limit))
-            sprintf('%s&limit=%s',url,limit) -> url        
-        
+            sprintf('%s&limit=%s',url,limit) -> url
+
         getURL(
             url = url %>>%
             URLencode
@@ -959,9 +970,9 @@ FredR <- function(api.key = NULL){
             useInternalNodes = TRUE
         ) -> l
 
-        dt <- xml2dt(l) 
+        dt <- xml2dt(l)
 
-        return(dt)                
+        return(dt)
     }
 
     source <- function(
@@ -969,7 +980,7 @@ FredR <- function(api.key = NULL){
     ){
         if (is.null(source_id))
             stop("source_id is a required argument.")
-        
+
         query = 'fred/source'
         url = sprintf(
             "%s/%s?&api_key=%s",
@@ -979,8 +990,8 @@ FredR <- function(api.key = NULL){
         )
 
         if (!is.null(source_id))
-            sprintf('%s&source_id=%s',url,source_id) -> url        
-        
+            sprintf('%s&source_id=%s',url,source_id) -> url
+
         getURL(
             url = url %>>%
             URLencode
@@ -989,9 +1000,9 @@ FredR <- function(api.key = NULL){
             useInternalNodes = TRUE
         ) -> l
 
-        dt <- xml2dt(l) 
+        dt <- xml2dt(l)
 
-        return(dt)                
+        return(dt)
     }
 
     source.releases <- function(
@@ -1000,7 +1011,7 @@ FredR <- function(api.key = NULL){
     ){
         if (is.null(source_id))
             stop("source_id is a required argument.")
-        
+
         query = 'fred/source/releases'
         url = sprintf(
             "%s/%s?&api_key=%s",
@@ -1012,8 +1023,8 @@ FredR <- function(api.key = NULL){
         if (!is.null(source_id))
             sprintf('%s&source_id=%s',url,source_id) -> url
         if (!is.null(limit))
-            sprintf('%s&limit=%s',url,limit) -> url               
-        
+            sprintf('%s&limit=%s',url,limit) -> url
+
         getURL(
             url = url %>>%
             URLencode
@@ -1022,11 +1033,11 @@ FredR <- function(api.key = NULL){
             useInternalNodes = TRUE
         ) -> l
 
-        dt <- xml2dt(l) 
+        dt <- xml2dt(l)
 
-        return(dt)                
-    }    
-    
+        return(dt)
+    }
+
     ## ---------------------------------------------------------------------- ##
     ## TAGS                                                                   ##
     ## ---------------------------------------------------------------------- ##
@@ -1036,7 +1047,7 @@ FredR <- function(api.key = NULL){
         tag_group_id = NULL,
         search_text = NULL,
         limit = NULL
-    ){        
+    ){
         query = 'fred/tags'
         url = sprintf(
             "%s/%s?api_key=%s",
@@ -1054,8 +1065,8 @@ FredR <- function(api.key = NULL){
         if (!is.null(search_text))
             sprintf('%s&search_text=%s',url,search_text) -> url
         if (!is.null(limit))
-            sprintf('%s&limit=%s',url,limit) -> url        
-        
+            sprintf('%s&limit=%s',url,limit) -> url
+
         getURL(
             url = url %>>%
             URLencode
@@ -1064,9 +1075,9 @@ FredR <- function(api.key = NULL){
             useInternalNodes = TRUE
         ) -> l
 
-        dt <- xml2dt(l) 
+        dt <- xml2dt(l)
 
-        return(dt)                
+        return(dt)
     }
 
 
@@ -1082,7 +1093,7 @@ FredR <- function(api.key = NULL){
             stop('At least one of the tag_names and exclude_tag_names parameters are required to be set')
         if (limit > 1000 | limit < 0)
             stop("Limit must be between 0 and 1000.")
-        
+
         query = 'fred/related_tags'
         url = sprintf(
             "%s/%s?&api_key=%s",
@@ -1100,8 +1111,8 @@ FredR <- function(api.key = NULL){
         if (!is.null(search_text))
             sprintf('%s&search_text=%s',url,search_text) -> url
         if (!is.null(limit))
-            sprintf('%s&limit=%s',url,limit) -> url        
-        
+            sprintf('%s&limit=%s',url,limit) -> url
+
         getURL(
             url = url %>>%
             URLencode
@@ -1110,9 +1121,9 @@ FredR <- function(api.key = NULL){
             useInternalNodes = TRUE
         ) -> l
 
-        dt <- xml2dt(l) 
+        dt <- xml2dt(l)
 
-        return(dt)                
+        return(dt)
     }
 
     tags.series <- function(
@@ -1124,7 +1135,7 @@ FredR <- function(api.key = NULL){
             stop('At least one of the tag_names and exclude_tag_names parameters are required to be set')
         if (limit > 1000 | limit < 0)
             stop("Limit must be between 0 and 1000.")
-        
+
         query = 'fred/tags/series'
         url = sprintf(
             "%s/%s?&api_key=%s",
@@ -1138,8 +1149,8 @@ FredR <- function(api.key = NULL){
         if (!is.null(exclude_tag_names))
             sprintf('%s&exclude_tag_names=%s',url,exclude_tag_names %>>% paste(collapse = ";")) -> url
         if (!is.null(limit))
-            sprintf('%s&limit=%s',url,limit) -> url        
-        
+            sprintf('%s&limit=%s',url,limit) -> url
+
         getURL(
             url = url %>>%
             URLencode
@@ -1148,11 +1159,11 @@ FredR <- function(api.key = NULL){
             useInternalNodes = TRUE
         ) -> l
 
-        dt <- xml2dt(l) 
+        dt <- xml2dt(l)
 
-        return(dt)                
-    }    
-    
+        return(dt)
+    }
+
     ## Return
     o <- list(
         getChildrenList = getChildrenList,
