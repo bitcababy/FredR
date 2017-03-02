@@ -15,3 +15,4 @@ Imports: XML,
 License: MIT + file LICENSE
 LazyData: true
 Suggests: testthat
+RoxygenNote: 6.0.1

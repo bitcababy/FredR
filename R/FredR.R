@@ -16,7 +16,7 @@
 ##' the descriptions of particular calls and their parameters here: http://api.stlouisfed.org/docs/fred/?utm_source=research&utm_medium=website&utm_campaign=data-tools
 ##' @author Janko Cizel
 ##' @export
-##' @import XML RCurl data.table pipeR rlist dplyr
+##' @import utils XML RCurl data.table pipeR rlist dplyr
 FredR <- function(api.key = NULL){
 
     if (is.null(api.key))
@@ -114,12 +114,12 @@ FredR <- function(api.key = NULL){
     ## CATEGORIES                                                             ##
     ## ---------------------------------------------------------------------- ##
     ##' @title category :
-    ##' @param category.id The FRED category ID
+    ##' @param category_id The FRED category ID
     ##
     ##' @return a datatable
     ##' @author Janko Cizel
     ##' @export
-    ##' @import XML RCurl data.table pipeR rlist dplyr
+    ##'
     category <- function(
         category_id = NULL
     ){
@@ -674,24 +674,50 @@ FredR <- function(api.key = NULL){
         return(dt)
     }
 
+#' @param series_id A string
+#' @param limit An integer between 1 and 100000
+#' @param observation_start YYYY-MM-DD formatted string
+#' @param observation_end YYYY-MM-DD formatted string
+#' @param units One of the following values: 'lin', 'chg', 'ch1', '
+#' pch', 'pc1', 'pca', 'cch', 'cca', 'log'
+#'
+#' @param frequency One of the following values: 'd', 'w', 'bw', 'm', 'q', 'sa', 'a',
+#' 'wef', 'weth', 'wew', 'wetu', 'wem', 'wesu', 'wesa', 'bwew', 'bwem'
+#' @param aggregation_method One of the following values: 'avg', 'sum', 'eop'
+#' @param output_type One of the following values: '1', '2', '3', '4'
+#' @param sort_order One of the following strings: 'asc', 'desc'.
+#' @param offset non-negative integer, optional, default: 0
+#'
+#' @return A datatable
+#' @usage series.observations(series_id = "12345")
     series.observations <- function(
         series_id = NULL,
         limit = NULL,
         observation_start = NULL,       # YYYY-MM-DD
         observation_end = NULL,         # YYYY-MM-DD
-        units = NULL,                   #'lin', 'chg', 'ch1', 'pch', 'pc1',
-                                        #'pca', 'cch', 'cca', 'log'
+        units = NULL,                   # 'lin', 'chg', 'ch1', 'pch', 'pc1',
+                                        # 'pca', 'cch', 'cca', 'log'
+                                        # 'lin' = No transformation
+                                        # 'chg' = Change from last period
+                                        # 'ch1' = Change from a year ago
+                                        # 'pch' = Percent change
+                                        # 'pc1' = Percent change from year ago
+                                        # 'pca' = Compounded annual rate of change
+                                        # 'cch' = Continuously Compounded rate of change
+                                        # 'cca' = Continuously Compounded annual rate of change
+                                        # 'log' = Natural log
         frequency = NULL,               # 'd', 'w', 'bw', 'm', 'q', 'sa', 'a',
                                         # 'wef', 'weth', 'wew', 'wetu', 'wem',
                                         # 'wesu', 'wesa', 'bwew', 'bwem'
-        aggregation_method = NULL,      #'avg', 'sum', 'eop'
+        aggregation_method = NULL,      # 'avg', 'sum', 'eop'
         output_type = NULL,              #  '1', '2', '3', '4'
                                         # 1 = Observations by Real-Time Period
                                         # 2 = Observations by Vintage Date, All Observations
                                         # 3 = Observations by Vintage Date, New and Revised Observations Only
                                         # 4 = Observations, Initial Release Only
 
-        sort_order # 'asc', 'desc'
+        sort_order = NULL, # 'asc', 'desc'
+        offset = NULL # 'non-negative integer'
          ){
         if (is.null(series_id))
             stop('series_id is a required input.')
@@ -727,8 +753,8 @@ FredR <- function(api.key = NULL){
         if (!is.null(output_type))
             sprintf('%s&output_type=%s',url,output_type) -> url
 
-        if (!is.null(sorted_by) && (sorted_by == 'asc' || sorted_by == 'desc'))
-            sprintf('%s&sorted_by=%s', url, sorted_by) -> url
+        if (!is.null(sort_order) && sort_order == 'desc')
+            sprintf('%s&sort_order=%s', url, sort_order) -> url
 
         getURL(
             url = url %>>% URLencode
@@ -1167,7 +1193,7 @@ FredR <- function(api.key = NULL){
     ## Return
     o <- list(
         getChildrenList = getChildrenList,
-        cetegory = category,
+        category = category,
         category.children = category.children,
         category.related = category.related,
         category.series = category.series,
